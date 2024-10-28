@@ -5,20 +5,16 @@
 #include<d3d12.h>
 #include<dxgi1_6.h>
 #include<cassert>
-
 #include <dxgidebug.h>
-
 #include <dxcapi.h>
-
 #include <fstream>
 #include <sstream>
-
 #include "externals/DirectXTex/DirectXTex.h"
-
-
 #include"externals/imgui/imgui.h"
 #include"externals/imgui/imgui_impl_dx12.h"
 #include"externals/imgui/imgui_impl_win32.h"
+#include"Input.h"
+
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 #define _USE_MATH_DEFINES
@@ -1017,7 +1013,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg,
 //Windowsアプリのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
-	CoInitializeEx(0, COINIT_MULTITHREADED);
+	
 
 
 #pragma region Windouの生成
@@ -1130,6 +1126,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	assert(device != nullptr);
 	log("Complete create D3D12Device!!!\n");
+
+	CoInitializeEx(0, COINIT_MULTITHREADED);
+	//ポインタ
+	Input* input = nullptr;
+	//入力の初期化
+	input = new Input();
+	input->Initialize(wc.hInstance, hwnd);
 
 #pragma endregion
 
@@ -2162,6 +2165,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		debug->ReportLiveObjects(DXGI_DEBUG_APP, DXGI_DEBUG_RLO_ALL);
 		debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
 		debug->Release();
+		//入力解放
+		delete input;
 	}
 
 	CoUninitialize();
