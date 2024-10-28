@@ -2152,7 +2152,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	depthStencilResource2->Release();
 	dsvDescriptorHeap2->Release();
 
-
+	//入力解放
+	delete input;
 
 	CloseWindow(hwnd);
 
@@ -2165,8 +2166,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		debug->ReportLiveObjects(DXGI_DEBUG_APP, DXGI_DEBUG_RLO_ALL);
 		debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
 		debug->Release();
-		//入力解放
-		delete input;
+		
 	}
 
 	CoUninitialize();
