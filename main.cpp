@@ -14,19 +14,12 @@
 #include"externals/imgui/imgui_impl_dx12.h"
 #include"externals/imgui/imgui_impl_win32.h"
 #include"Input.h"
-
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
 #define _USE_MATH_DEFINES
 #include <math.h>
-
-
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
-
 #pragma comment(lib,"dxguid.lib")
-
-
 #pragma comment(lib,"dxcompiler.lib")
 
 //std::string str0{ "STRING!!!" };
@@ -1128,11 +1121,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	log("Complete create D3D12Device!!!\n");
 
 	CoInitializeEx(0, COINIT_MULTITHREADED);
+
 	//ポインタ
 	Input* input = nullptr;
 	//入力の初期化
 	input = new Input();
 	input->Initialize(wc.hInstance, hwnd);
+	
 
 #pragma endregion
 
@@ -1807,6 +1802,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			ImGui_ImplDX12_NewFrame();
 			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();
+			//入力の更新
+			input->Update();
 
 			//transform.rotate.y += 0.03f;
 
