@@ -1762,7 +1762,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	float* inputDirectionLight[3] = { &directionalLightSphereData->direction.x,&directionalLightSphereData->direction.y,&directionalLightSphereData->direction.z };
 	float* intensity = &directionalLightSphereData->intensity;
 
-
+	float TriggerCheck = 10.0f;
 
 	//ImGui初期化
 	IMGUI_CHECKVERSION();
@@ -1804,6 +1804,28 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			ImGui::NewFrame();
 			//入力の更新
 			input->Update();
+
+			if (input->PushKey(DIK_0)) {//数字の0キーを押されていたら
+				OutputDebugStringA("Hit 0\n");
+			}
+
+			if (input->PushKey(DIK_UP)) {
+				transformSprite.translate.y -= 1;
+			}
+			if (input->PushKey(DIK_DOWN)) {
+				transformSprite.translate.y += 1;
+			}
+			if (input->PushKey(DIK_LEFT)) {
+				transformSprite.translate.x -= 1;
+			}
+			if (input->PushKey(DIK_RIGHT)) {
+				transformSprite.translate.x += 1;
+			}
+
+			if (input->TriggerKey(DIK_SPACE)) {
+				TriggerCheck *= -1.0f;
+				transformSprite.translate.x += TriggerCheck;
+			}
 
 			//transform.rotate.y += 0.03f;
 
