@@ -1016,8 +1016,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	winApp = new WinApp();
 	winApp->Initialize();
 
-	//WindowsAPI解放
-	delete winApp;
+
 
 	struct D3DResourceLeakChecker {
 		~D3DResourceLeakChecker() {
@@ -1119,7 +1118,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Input* input = nullptr;
 	//入力の初期化
 	input = new Input();
-	input->Initialize(winApp->GetHInstance(), winApp->GetHwnd());
+	input->Initialize(winApp);
 	
 
 #pragma endregion
@@ -1893,7 +1892,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			materialDateSprite->uvTransform = uvTransformMatrix;
 
 			//開発用UIの処理
-			ImGui::ShowDemoWindow();
+			//ImGui::ShowDemoWindow();
 
 			//ここにテキストを入れられる
 			ImGui::Text("ImGuiText");
@@ -2180,9 +2179,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//入力解放
 	delete input;
 
-	CloseWindow(winApp->GetHwnd());
+	//WindowsAPIの終了処理
+	winApp->Finalize();
+	//WindowsAPI解放
+	delete winApp;
+	winApp = nullptr;
 
-	CoUninitialize();
+	/*CloseWindow(winApp->GetHwnd());
+	CoUninitialize();*/
+
+	
 
 
 	return 0;

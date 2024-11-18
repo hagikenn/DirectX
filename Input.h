@@ -3,7 +3,7 @@
 #include <dinput.h>
 #include<wrl.h>
 #define DIRECTNPUT_VERSION 0x800//DirectInputのバージョン指定
-
+#include"WinApp.h"
 
 
 class Input
@@ -12,7 +12,7 @@ public:
 	//namespace省略
 	template<class T>using ComPtr = Microsoft::WRL::ComPtr<T>;
 
-	void Initialize(HINSTANCE hInstance, HWND hwnd);
+	void Initialize(WinApp* winApp);
 	void Update();
 
 	bool PushKey(BYTE keyNumber);
@@ -31,6 +31,9 @@ private:
 
 	//前回の全キーの状態
 	BYTE keyPre[256] = {};
+
+	//WindowsAPI
+	WinApp* winApp_ = nullptr;
 
 };
 
