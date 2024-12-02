@@ -2,9 +2,9 @@
 #include <cstdint>
 #include <string>
 #include<format>
-#include<d3d12.h>
-#include<dxgi1_6.h>
-#include<cassert>
+//#include<cassert>
+//#include<d3d12.h>
+//#include<dxgi1_6.h>
 #include <dxgidebug.h>
 #include <dxcapi.h>
 #include <fstream>
@@ -17,48 +17,44 @@
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 #define _USE_MATH_DEFINES
 #include <math.h>
-#pragma comment(lib,"d3d12.lib")
-#pragma comment(lib,"dxgi.lib")
+//#pragma comment(lib,"d3d12.lib")
+//#pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxguid.lib")
 #pragma comment(lib,"dxcompiler.lib")
 #include"WinApp.h"
+#include"DirectXCommon.h"
 
-
-//std::string str0{ "STRING!!!" };
+//std::wstring ConvertString(const std::string& str) {
+//	if (str.empty()) {
+//		return std::wstring();
+//	}
 //
-//std::string str1{ std::to_string(10) };
-
-std::wstring ConvertString(const std::string& str) {
-	if (str.empty()) {
-		return std::wstring();
-	}
-
-	auto sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&str[0]), static_cast<int>(str.size()), NULL, 0);
-	if (sizeNeeded == 0) {
-		return std::wstring();
-	}
-	std::wstring result(sizeNeeded, 0);
-	MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&str[0]), static_cast<int>(str.size()), &result[0], sizeNeeded);
-	return result;
-}
-
-std::string ConvertString(const std::wstring& str) {
-	if (str.empty()) {
-		return std::string();
-	}
-
-	auto sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), NULL, 0, NULL, NULL);
-	if (sizeNeeded == 0) {
-		return std::string();
-	}
-	std::string result(sizeNeeded, 0);
-	WideCharToMultiByte(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), result.data(), sizeNeeded, NULL, NULL);
-	return result;
-}
-
-void log(const std::string& message) {
-	OutputDebugStringA(message.c_str());
-}
+//	auto sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&str[0]), static_cast<int>(str.size()), NULL, 0);
+//	if (sizeNeeded == 0) {
+//		return std::wstring();
+//	}
+//	std::wstring result(sizeNeeded, 0);
+//	MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char*>(&str[0]), static_cast<int>(str.size()), &result[0], sizeNeeded);
+//	return result;
+//}
+//
+//std::string ConvertString(const std::wstring& str) {
+//	if (str.empty()) {
+//		return std::string();
+//	}
+//
+//	auto sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), NULL, 0, NULL, NULL);
+//	if (sizeNeeded == 0) {
+//		return std::string();
+//	}
+//	std::string result(sizeNeeded, 0);
+//	WideCharToMultiByte(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), result.data(), sizeNeeded, NULL, NULL);
+//	return result;
+//}
+//
+//void log(const std::string& message) {
+//	OutputDebugStringA(message.c_str());
+//}
 
 //ComplierShader関数
 IDxcBlob* CompileShader(
@@ -1010,12 +1006,16 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg,
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	//ポインタ
+	DirectXCommon* dxCommon = nullptr;
 	WinApp* winApp = nullptr;
 
 	//WindowsAPIの初期化
 	winApp = new WinApp();
 	winApp->Initialize();
 
+	//DirectXの初期化
+	dxCommon = new DirectXCommon();
+	dxCommon->Initialize();
 
 
 	struct D3DResourceLeakChecker {
@@ -1091,9 +1091,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	assert(useAdapter != nullptr);
 
 #pragma endregion
-
+	
 #pragma region Deviceの生成
-	Microsoft::WRL::ComPtr<ID3D12Device>device = nullptr;
+	
 	//ID3D12Device* device = nullptr;
 
 	D3D_FEATURE_LEVEL featureLevels[] = {
@@ -2184,6 +2184,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//WindowsAPI解放
 	delete winApp;
 	winApp = nullptr;
+
+	//DirectX解放
+	delete dxCommon;
 
 	/*CloseWindow(winApp->GetHwnd());
 	CoUninitialize();*/
