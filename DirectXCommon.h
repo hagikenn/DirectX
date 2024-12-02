@@ -67,6 +67,8 @@ private:
 
 
 private:
+	//コマンドキュー生成
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue>commandQueue = nullptr;
 
 	//WindowAPI
 	WinApp* winApp = nullptr;
