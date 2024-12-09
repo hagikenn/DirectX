@@ -80,6 +80,8 @@ private:
 	//WindowAPI
 	WinApp* winApp = nullptr;
 
+	
+
 	//DirectX12デバイス
 	Microsoft::WRL::ComPtr<ID3D12Device>device = nullptr;
 	//DXGIファクトリ
@@ -137,6 +139,8 @@ private:
 #pragma endregion
 
 #pragma region DXCコンパイラの生成
+	HRESULT hr;
+
 	//DXCユーティリティの生成
 	IDxcUtils* dxcUtils;
 	//DXCコンパイラの生成
