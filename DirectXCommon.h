@@ -3,12 +3,16 @@
 #include<dxgi1_6.h>
 #include<wrl.h>
 #include"WinApp.h"
+#include<string>
+#include<array>
+#include<dxcapi.h>
+#include"externals/DirectXTex/DirectXTex.h"
 
 class DirectXCommon
 {
 public://メンバ関数
 	//初期化
-	void Initialize();
+	void Initialize(WinApp* winApp);
 
 private:
 	//デバイスの生成
@@ -77,6 +81,20 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Device>device = nullptr;
 	//DXGIファクトリ
 	Microsoft::WRL::ComPtr<IDXGIFactory7>dxgiFactory;
+
+
+#pragma region
+	//各種デスクリプタヒープの生成
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>rtvDescriptorHeap;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>srvDescriptorHeap;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>dsvDescriptorHeap2;
+	uint32_t descriptorSizeSRV;
+	uint32_t descriptorSizeRTV;
+	uint32_t descriptorSizeDSV;
+	Microsoft::WRL::ComPtr<ID3D12Resource>textureResource2;
+	Microsoft::WRL::ComPtr<ID3D12Resource>depthStencilResource2;
+#pragma endregion
+
 
 	//スワップチェーンリソース
 	
