@@ -158,6 +158,7 @@ void DirectXCommon::CreateDevice()
 	HRESULT hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
 	assert(SUCCEEDED(hr));
 
+	
 
 #pragma region アダプタの作成
 

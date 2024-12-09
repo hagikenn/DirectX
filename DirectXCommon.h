@@ -40,6 +40,9 @@ private:
 	//ImGuiの初期化
 	void ImGuiInitialize();
 
+	void log(const std::string& message) {
+		OutputDebugStringA(message.c_str());
+	}
 
 	///<summary>
 	///デスクリプタヒープを生成する
