@@ -142,9 +142,7 @@ private:
 	IDxcIncludeHandler* includeHandler;
 #pragma endregion
 
-	//スワップチェーンリソース
-	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2>swapChainResource;
-
+	
 
 };
 

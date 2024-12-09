@@ -24,6 +24,31 @@ void DirectXCommon::Initialize(WinApp* winApp)
 	//メンバ変数に記録
 	this->winApp = winApp;
 
+	//デバイスの生成
+	CreateDevice();
+	//コマンド関連の初期化
+	CommandInitialize();
+	//スワップチェーンの生成
+	CreateSwapChain();
+	//深度バッファの生成
+	DepthBuffer();
+	//各種デスクリプタヒープの生成
+	DescriptorHeap();
+	//レンダーターゲットビューの初期化
+	RTVInitialize();
+	//深度ステンシルビューの初期化
+	DSVInitialize();
+	//フェンスの初期化
+	FenceInitialize();
+	//ビューポート矩形の初期化
+	ViewPortRectangle();
+	//シザリング矩形の初期化
+	ScissoringRectangle();
+	//DXCコンパイラの生成
+	CreateCompiler();
+	//ImGuiの初期化
+	ImGuiInitialize();
+
 }
 
 DirectX::ScratchImage LoadTexture(const std::string& filePath) {
@@ -131,11 +156,65 @@ void DirectXCommon::CreateDevice()
 {
 	
 	HRESULT hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
+	assert(SUCCEEDED(hr));
 
 
+#pragma region アダプタの作成
+
+	//使用するアダプタ用の変数。最初にnullptrを入れておく
+	Microsoft::WRL::ComPtr<IDXGIAdapter4>useAdapter = nullptr;
+	//IDXGIAdapter4* useAdapter = nullptr;
+	//良い順にアダプタを読む
+	for (UINT i = 0; dxgiFactory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&useAdapter)) != DXGI_ERROR_NOT_FOUND; i++) {
+		//アダプターの情報を取得する
+		DXGI_ADAPTER_DESC3 adapterDesc{};
+		hr = useAdapter->GetDesc3(&adapterDesc);
+		assert(SUCCEEDED(hr));
+		//ソフトウェアダプタでなければ採用
+		if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE)) {
+			//採用したアダプタの情報をログに出力。wstringのほうなので注意
+			log(ConvertString(std::format(L"Use Adapter:{}\n", adapterDesc.Description)));
+			break;
+		}
+		useAdapter = nullptr;
+	}
+	//適切なアダプタが見つからないので起動しない
+	//適切なアダプタが見つからなかったら起動できなくする
+	assert(useAdapter != nullptr);
+
+#pragma endregion
+
+
+#pragma region Deviceの生成
+	//ID3D12Device* device = nullptr;
+
+	D3D_FEATURE_LEVEL featureLevels[] = {
+		D3D_FEATURE_LEVEL_12_2,D3D_FEATURE_LEVEL_12_1,D3D_FEATURE_LEVEL_12_0
+	};
+	const char* featureLevelStrings[] = { "12.2","12.1","12,0" };
+
+	for (size_t i = 0; i < _countof(featureLevels); ++i) {
+		hr = D3D12CreateDevice(useAdapter.Get(), featureLevels[i], IID_PPV_ARGS(&device));
+		if (SUCCEEDED(hr)) {
+			log(std::format("FEatureLevel : {}\n", featureLevelStrings[i]));
+			break;
+		}
+	}
+
+	assert(device != nullptr);
+	log("Complete create D3D12Device!!!\n");
+
+#pragma endregion
+
+}
+
+//コマンド関連の初期化
+void DirectXCommon::CommandInitialize()
+{
 #pragma region コマンドキュー
+	HRESULT hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
+	assert(SUCCEEDED(hr));
 
-	
 	//ID3D12CommandQueue* commandQueue = nullptr;
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
 	hr = device->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&commandQueue));
@@ -160,6 +239,7 @@ void DirectXCommon::CreateDevice()
 	//生成できない場合
 	assert(SUCCEEDED(hr));
 #pragma endregion
+
 }
 
 //スワップチェーンの生成
@@ -178,14 +258,14 @@ void DirectXCommon::CreateSwapChain()
 	swapChainDesc.BufferCount = 2;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
-	hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue.Get(), winApp->GetHwnd(), &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(swapChain.GetAddressOf()));
+	/*hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue.Get(), winApp->GetHwnd(), &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(swapChain.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 
 	hr = swapChain->GetBuffer(0, IID_PPV_ARGS(&swapChainResource[0]));
 	assert(SUCCEEDED(hr));
 
 	hr = swapChain->GetBuffer(1, IID_PPV_ARGS(&swapChainResource[1]));
-	assert(SUCCEEDED(hr));
+	assert(SUCCEEDED(hr));*/
 #pragma endregion
 }
 
@@ -286,10 +366,8 @@ void DirectXCommon::RTVInitialize()
 	//裏表の2つ分
 	for (uint32_t i = 0; i < 2;++i) {
 		rtvHandles[0] = rtvStartHandle;
-		device->CreateRenderTargetView(swapChainResource[i].Get(), &rtvDesc, rtvHandles[0]);
-
 		rtvHandles[1].ptr = rtvHandles[0].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-		device->CreateRenderTargetView(swapChainResource[i].Get(), &rtvDesc, rtvHandles[1]);
+		device->CreateRenderTargetView(swapChainResource[i].Get(), &rtvDesc, rtvHandles[i]);
 
 	}
 
@@ -304,13 +382,13 @@ void DirectXCommon::DSVInitialize()
 	dsvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 
 	//DSV生成
-	D3D12_DEPTH_STENCIL_VIEW_DESC dscDesc2{};
-	dscDesc2.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	dscDesc2.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+	D3D12_DEPTH_STENCIL_VIEW_DESC dscDesc{};
+	dscDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	dscDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 	
 	
 	//DSVHeapの先頭
-	device->CreateDepthStencilView(depthStencilResource.Get(), &dscDesc2, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+	device->CreateDepthStencilView(depthStencilResource.Get(), &dscDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
 //フェンスの初期化
