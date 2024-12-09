@@ -169,10 +169,7 @@ void DirectXCommon::CreateSwapChain()
 
 
 #pragma region Swap Chainの生成
-	//スワップチェイン生成
-	Microsoft::WRL::ComPtr<IDXGISwapChain4>swapChain = nullptr;
-	//IDXGISwapChain4* swapChain = nullptr;
-	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
+	
 	swapChainDesc.Width = WinApp::kClientWidth;
 	swapChainDesc.Height = WinApp::kClientHeight;
 	swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -281,7 +278,6 @@ void DirectXCommon::DescriptorHeap()
 void DirectXCommon::RTVInitialize()
 {
 	//RTV
-	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
 	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
@@ -302,19 +298,66 @@ void DirectXCommon::RTVInitialize()
 //深度ステンシルビューの初期化
 void DirectXCommon::DSVInitialize()
 {
+	depthStencilResource = CreateDepthStencilTextureResource(device.Get(), WinApp::kClientWidth, WinApp::kClientHeight);
+
 	//DSVようのヒープでディスクリプタの数1、shader内で触らないのでfalse
-	dsvDescriptorHeap2 = CreateDescriptorHeap(device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+	dsvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 
 	//DSV生成
 	D3D12_DEPTH_STENCIL_VIEW_DESC dscDesc2{};
 	dscDesc2.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	dscDesc2.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-	//DSVHeapの先頭
-	//device->CreateDepthStencilView(depthStencilResource2, &dscDesc2, dsvDescriptorHeap2->GetCPUDescriptorHandleForHeapStart());
-
+	
 	
 	//DSVHeapの先頭
-	device->CreateDepthStencilView(depthStencilResource.Get(), &dscDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+	device->CreateDepthStencilView(depthStencilResource.Get(), &dscDesc2, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+}
+
+//フェンスの初期化
+void DirectXCommon::FenceInitialize()
+{
+	
+	uint64_t fenceValue = 0;
+	HRESULT hr = device->CreateFence(fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+	assert(SUCCEEDED(hr));
+
+	HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+	assert(fenceEvent != nullptr);
+}
+
+//ビューポート矩形の初期化
+void DirectXCommon::ViewPortRectangle()
+{
+}
+
+//シザリング矩形の初期化
+void DirectXCommon::ScissoringRectangle()
+{
+}
+
+//DXCコンパイラの生成
+void DirectXCommon::CreateCompiler()
+{
+	//DXCユーティリティの生成
+	dxcUtils;
+	//DXCコンパイラの生成
+	dxcCompiler;
+	//デフォルトインクルードハンドラの生成
+	includeHandler;
+}
+
+//ImGuiの初期化
+void DirectXCommon::ImGuiInitialize()
+{
+	//ImGui初期化
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGui::StyleColorsDark();
+	ImGui_ImplWin32_Init(winApp->GetHwnd());
+	ImGui_ImplDX12_Init(device.Get(), swapChainDesc.BufferCount,
+		rtvDesc.Format, srvDescriptorHeap.Get(),
+		srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
+		srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetSRVCPUDescriptorHandle(uint32_t index)

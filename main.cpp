@@ -1053,47 +1053,47 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 	
-	//textureを読んで転送
-	DirectX::ScratchImage mipImages = LoadTexture("resource/uvChecker.png");
-	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	Microsoft::WRL::ComPtr<ID3D12Resource>textureResource = CrateTextureResource(device.Get(), metadata);
-	//ID3D12Resource* textureResource = CrateTextureResource(device.Get(), metadata);
-	UploadTextureData(textureResource.Get(), mipImages);
+	////textureを読んで転送
+	//DirectX::ScratchImage mipImages = LoadTexture("resource/uvChecker.png");
+	//const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+	//Microsoft::WRL::ComPtr<ID3D12Resource>textureResource = CrateTextureResource(device.Get(), metadata);
+	////ID3D12Resource* textureResource = CrateTextureResource(device.Get(), metadata);
+	//UploadTextureData(textureResource.Get(), mipImages);
 
-	Microsoft::WRL::ComPtr<ID3D12Resource>depthStencilResource = CreateDepthStencilTextureResource(device.Get(), WinApp::kClientWidth, WinApp::kClientHeight);
-	//ID3D12Resource* depthStencilResource = CreateDepthStencilTextureResource(device.Get(), kClientWidth, kClientHeight);
+	//Microsoft::WRL::ComPtr<ID3D12Resource>depthStencilResource = CreateDepthStencilTextureResource(device.Get(), WinApp::kClientWidth, WinApp::kClientHeight);
+	////ID3D12Resource* depthStencilResource = CreateDepthStencilTextureResource(device.Get(), kClientWidth, kClientHeight);
 
-	//DSVようのヒープでディスクリプタの数1、shader内で触らないのでfalse
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>dsvDescriptorHeap = CreateDescriptorHeap(device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
-	//ID3D12DescriptorHeap* dsvDescriptorHeap = CreateDescriptorHeap(device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+	////DSVようのヒープでディスクリプタの数1、shader内で触らないのでfalse
+	//Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>dsvDescriptorHeap = CreateDescriptorHeap(device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+	////ID3D12DescriptorHeap* dsvDescriptorHeap = CreateDescriptorHeap(device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 
-	//DSV生成
-	D3D12_DEPTH_STENCIL_VIEW_DESC dscDesc{};
-	dscDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	dscDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+	////DSV生成
+	//D3D12_DEPTH_STENCIL_VIEW_DESC dscDesc{};
+	//dscDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	//dscDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 	////DSVHeapの先頭
 	//device->CreateDepthStencilView(depthStencilResource.Get(), &dscDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
 
-	//metadataを基にSRVの設定
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-	srvDesc.Format = metadata.format;
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
+	////metadataを基にSRVの設定
+	//D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	//srvDesc.Format = metadata.format;
+	//srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	//srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	//srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
-	//SRVを作成するDescriptorHeap場所決め
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSizeSRV, 0);
-	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = GetGPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSizeSRV, 0);
-	//D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	//D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-	//先頭ImGui
-	textureSrvHandleCPU.ptr += descriptorSizeSRV;
-	textureSrvHandleGPU.ptr += descriptorSizeSRV;
-	//textureSrvHandleCPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	//textureSrvHandleGPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	//SRVの生成
-	device->CreateShaderResourceView(textureResource.Get(), &srvDesc, textureSrvHandleCPU);
+	////SRVを作成するDescriptorHeap場所決め
+	//D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSizeSRV, 0);
+	//D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = GetGPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSizeSRV, 0);
+	////D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	////D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+	////先頭ImGui
+	//textureSrvHandleCPU.ptr += descriptorSizeSRV;
+	//textureSrvHandleGPU.ptr += descriptorSizeSRV;
+	////textureSrvHandleCPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	////textureSrvHandleGPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	////SRVの生成
+	//device->CreateShaderResourceView(textureResource.Get(), &srvDesc, textureSrvHandleCPU);
 
 
 
@@ -1484,27 +1484,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	float TriggerCheck = 10.0f;
 
-	//ImGui初期化
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGui::StyleColorsDark();
-	ImGui_ImplWin32_Init(winApp->GetHwnd());
-	ImGui_ImplDX12_Init(device.Get(), swapChainDesc.BufferCount,
-		rtvDesc.Format, srvDescriptorHeap.Get(),
-		srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
-		srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+	
 
 
 
-	//初期化で0でFenceを作る
-	Microsoft::WRL::ComPtr<ID3D12Fence>fence = nullptr;
-	//ID3D12Fence* fence = nullptr;
-	uint64_t fenceValue = 0;
-	hr = device->CreateFence(fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
-	assert(SUCCEEDED(hr));
+	////初期化で0でFenceを作る
+	//Microsoft::WRL::ComPtr<ID3D12Fence>fence = nullptr;
+	////ID3D12Fence* fence = nullptr;
+	//uint64_t fenceValue = 0;
+	//hr = device->CreateFence(fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+	//assert(SUCCEEDED(hr));
 
-	HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-	assert(fenceEvent != nullptr);
+	//HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+	//assert(fenceEvent != nullptr);
 
 
 
@@ -1668,6 +1660,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//描画用のDescriptorHeap
 		ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap.Get() };
 		commandList->SetDescriptorHeaps(1, descriptorHeaps);
+
+
 
 		//DSV
 		D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();

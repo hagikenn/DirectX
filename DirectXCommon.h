@@ -90,18 +90,24 @@ private:
 	
 #pragma endregion
 
-#pragma region
-	//スワップチェーンの生成
+#pragma region スワップチェーンの生成
+	//スワップチェイン生成
+	Microsoft::WRL::ComPtr<IDXGISwapChain4>swapChain = nullptr;
+
+	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
+
 
 	//SwapchainからResourceを引っ張ってくる
 	Microsoft::WRL::ComPtr<ID3D12Resource>swapChainResource[2] = { nullptr };
 
 #pragma endregion
 
-#pragma region
-	//各種デスクリプタヒープの生成
+#pragma region 各種デスクリプタヒープの生成
+	
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>rtvDescriptorHeap;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>srvDescriptorHeap;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>dsvDescriptorHeap;
+
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>dsvDescriptorHeap2;
 	uint32_t descriptorSizeSRV;
 	uint32_t descriptorSizeRTV;
@@ -110,12 +116,31 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource>depthStencilResource2;
 #pragma endregion
 
-#pragma region
-	//レンダーターゲットビューの初期化
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+#pragma region レンダーターゲットビューの初期化
+	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
 
+
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
 #pragma endregion
 
+#pragma region 深度ステンシルビューの初期化
+
+	Microsoft::WRL::ComPtr<ID3D12Resource>depthStencilResource;
+#pragma endregion
+
+#pragma region フェンスの初期化
+	//初期化で0でFenceを作る
+	Microsoft::WRL::ComPtr<ID3D12Fence>fence = nullptr;
+#pragma endregion
+
+#pragma region DXCコンパイラの生成
+	//DXCユーティリティの生成
+	IDxcUtils* dxcUtils;
+	//DXCコンパイラの生成
+	IDxcCompiler3* dxcCompiler;
+	//デフォルトインクルードハンドラの生成
+	IDxcIncludeHandler* includeHandler;
+#pragma endregion
 
 	//スワップチェーンリソース
 	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2>swapChainResource;
