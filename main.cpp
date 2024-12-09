@@ -1071,8 +1071,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	D3D12_DEPTH_STENCIL_VIEW_DESC dscDesc{};
 	dscDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	dscDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-	//DSVHeapの先頭
-	device->CreateDepthStencilView(depthStencilResource.Get(), &dscDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+	////DSVHeapの先頭
+	//device->CreateDepthStencilView(depthStencilResource.Get(), &dscDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
 
 	//metadataを基にSRVの設定

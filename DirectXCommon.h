@@ -59,7 +59,7 @@ private:
 		uint32_t descriptorSize, uint32_t index);
 
 	///<summary>
-	///SRVの指定番号のGPUデスクリプタハンドルを取得する
+	///SRVの指定番号のCPUデスクリプタハンドルを取得する
 	/// </summary>
 	D3D12_CPU_DESCRIPTOR_HANDLE GetSRVCPUDescriptorHandle(uint32_t index);
 
@@ -83,6 +83,21 @@ private:
 	Microsoft::WRL::ComPtr<IDXGIFactory7>dxgiFactory;
 
 
+
+#pragma region コマンドリスト
+	//コマンドリスト生成
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>commandList = nullptr;
+	
+#pragma endregion
+
+#pragma region
+	//スワップチェーンの生成
+
+	//SwapchainからResourceを引っ張ってくる
+	Microsoft::WRL::ComPtr<ID3D12Resource>swapChainResource[2] = { nullptr };
+
+#pragma endregion
+
 #pragma region
 	//各種デスクリプタヒープの生成
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>rtvDescriptorHeap;
@@ -95,9 +110,15 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource>depthStencilResource2;
 #pragma endregion
 
+#pragma region
+	//レンダーターゲットビューの初期化
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+
+#pragma endregion
+
 
 	//スワップチェーンリソース
-	
+	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2>swapChainResource;
 
 
 };

@@ -156,8 +156,6 @@ void DirectXCommon::CreateDevice()
 
 #pragma region コマンドリスト
 	//コマンドリスト生成
-	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>commandList = nullptr;
-	//ID3D12GraphicsCommandList* commandList = nullptr;
 	hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator.Get(), nullptr, IID_PPV_ARGS(&commandList));
 	//生成できない場合
 	assert(SUCCEEDED(hr));
@@ -185,10 +183,6 @@ void DirectXCommon::CreateSwapChain()
 
 	hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue.Get(), winApp->GetHwnd(), &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(swapChain.GetAddressOf()));
 	assert(SUCCEEDED(hr));
-
-	//SwapchainからResourceを引っ張ってくる
-	Microsoft::WRL::ComPtr<ID3D12Resource>swapChainResource[2] = { nullptr };
-	//ID3D12Resource* swapChainResource[2] = { nullptr };
 
 	hr = swapChain->GetBuffer(0, IID_PPV_ARGS(&swapChainResource[0]));
 	assert(SUCCEEDED(hr));
@@ -293,16 +287,60 @@ void DirectXCommon::RTVInitialize()
 
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+	//裏表の2つ分
+	for (uint32_t i = 0; i < 2;++i) {
+		rtvHandles[0] = rtvStartHandle;
+		device->CreateRenderTargetView(swapChainResource[i].Get(), &rtvDesc, rtvHandles[0]);
 
-	rtvHandles[0] = rtvStartHandle;
-	device->CreateRenderTargetView(swapChainResource[0].Get(), &rtvDesc, rtvHandles[0]);
+		rtvHandles[1].ptr = rtvHandles[0].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+		device->CreateRenderTargetView(swapChainResource[i].Get(), &rtvDesc, rtvHandles[1]);
 
-	//rtvHandles[1] = GetCPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 0); //おかしいかも
-	rtvHandles[1].ptr = rtvHandles[0].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	}
 
-	device->CreateRenderTargetView(swapChainResource[1].Get(), &rtvDesc, rtvHandles[1]);
+}
 
+//深度ステンシルビューの初期化
+void DirectXCommon::DSVInitialize()
+{
+	//DSV
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvHandle);
+
+
+
+	commandList->RSSetViewports(1, &viewport);
+	commandList->RSSetScissorRects(1, &scissorRect);
+
+	commandList->SetGraphicsRootSignature(rootSignature.Get());
+	commandList->SetPipelineState(graphicsPipelineState.Get());
+	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+
+
+	//model
+	commandList->IASetVertexBuffers(0, 1, &vertexBufferViewModel);
+
+	commandList->SetGraphicsRootConstantBufferView(0, materialResourceSphere->GetGPUVirtualAddress()); //rootParameterの配列の0番目 [0]
+
+	commandList->SetGraphicsRootConstantBufferView(1, wvpResourceSphere->GetGPUVirtualAddress());
+
+
+	if (textureChange == 0) {
+		commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+	}
+	else {
+		commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU2);
+	}
+
+	commandList->SetGraphicsRootConstantBufferView(3, directionalLightSphereResource->GetGPUVirtualAddress());
+
+
+	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+	commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+
+
+	//DSVHeapの先頭
+	device->CreateDepthStencilView(depthStencilResource.Get(), &dscDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetSRVCPUDescriptorHandle(uint32_t index)
