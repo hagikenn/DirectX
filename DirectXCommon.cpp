@@ -302,43 +302,17 @@ void DirectXCommon::RTVInitialize()
 //深度ステンシルビューの初期化
 void DirectXCommon::DSVInitialize()
 {
-	//DSV
-	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvHandle);
+	//DSVようのヒープでディスクリプタの数1、shader内で触らないのでfalse
+	dsvDescriptorHeap2 = CreateDescriptorHeap(device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 
+	//DSV生成
+	D3D12_DEPTH_STENCIL_VIEW_DESC dscDesc2{};
+	dscDesc2.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	dscDesc2.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+	//DSVHeapの先頭
+	//device->CreateDepthStencilView(depthStencilResource2, &dscDesc2, dsvDescriptorHeap2->GetCPUDescriptorHandleForHeapStart());
 
-
-	commandList->RSSetViewports(1, &viewport);
-	commandList->RSSetScissorRects(1, &scissorRect);
-
-	commandList->SetGraphicsRootSignature(rootSignature.Get());
-	commandList->SetPipelineState(graphicsPipelineState.Get());
-	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-
-
-	//model
-	commandList->IASetVertexBuffers(0, 1, &vertexBufferViewModel);
-
-	commandList->SetGraphicsRootConstantBufferView(0, materialResourceSphere->GetGPUVirtualAddress()); //rootParameterの配列の0番目 [0]
-
-	commandList->SetGraphicsRootConstantBufferView(1, wvpResourceSphere->GetGPUVirtualAddress());
-
-
-	if (textureChange == 0) {
-		commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-	}
-	else {
-		commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU2);
-	}
-
-	commandList->SetGraphicsRootConstantBufferView(3, directionalLightSphereResource->GetGPUVirtualAddress());
-
-
-	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-	commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
-
-
+	
 	//DSVHeapの先頭
 	device->CreateDepthStencilView(depthStencilResource.Get(), &dscDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 }
