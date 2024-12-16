@@ -358,7 +358,7 @@ void DirectXCommon::RTVInitialize()
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
 	//エラー中
-	//rtvStartHandle = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	rtvStartHandle = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
 	//裏表の2つ分
 	for (uint32_t i = 0; i < 2;++i) {
