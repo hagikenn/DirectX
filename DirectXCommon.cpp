@@ -380,7 +380,12 @@ void DirectXCommon::DescriptorHeap()
 void DirectXCommon::RTVInitialize()
 {
 	//SwapchainからResourceを引っ張ってくる
-	swapChainResource[2] = { nullptr };
+	
+	hr = swapChain->GetBuffer(0, IID_PPV_ARGS(&swapChainResource[0]));
+	assert(SUCCEEDED(hr));
+
+	hr = swapChain->GetBuffer(1, IID_PPV_ARGS(&swapChainResource[1]));
+	assert(SUCCEEDED(hr));
 
 	//RTV
 	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
@@ -498,4 +503,9 @@ D3D12_GPU_DESCRIPTOR_HANDLE DirectXCommon::GetGPUDescriptorHandle(const Microsof
 D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetSRVCPUDescriptorHandle(uint32_t index)
 {
 	return GetCPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, index);
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE DirectXCommon::GetSRVGPUDescriptorHandle(uint32_t index)
+{
+	return D3D12_GPU_DESCRIPTOR_HANDLE();
 }

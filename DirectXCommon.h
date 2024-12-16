@@ -133,7 +133,7 @@ private:
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle;
 	//SwapchainからResourceを引っ張ってくる
-	Microsoft::WRL::ComPtr<ID3D12Resource>swapChainResource[2];;
+	Microsoft::WRL::ComPtr<ID3D12Resource>swapChainResource[2]={ nullptr };
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>rtvDescriptorHeap;
 
 #pragma endregion
