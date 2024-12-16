@@ -121,7 +121,6 @@ private:
 
 #pragma region 各種デスクリプタヒープの生成
 	
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>rtvDescriptorHeap;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>srvDescriptorHeap;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>dsvDescriptorHeap;
 
@@ -137,6 +136,9 @@ private:
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle;
+
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>rtvDescriptorHeap;
+
 #pragma endregion
 
 #pragma region 深度ステンシルビューの初期化
