@@ -379,12 +379,15 @@ void DirectXCommon::DescriptorHeap()
 //レンダーターゲットビューの初期化
 void DirectXCommon::RTVInitialize()
 {
+	//SwapchainからResourceを引っ張ってくる
+	swapChainResource[2] = { nullptr };
+
 	//RTV
 	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
 	//エラー中
-	rtvStartHandle = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	//rtvStartHandle = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
 	//裏表の2つ分
 	for (uint32_t i = 0; i < 2;++i) {

@@ -113,10 +113,6 @@ private:
 
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
 
-
-	//SwapchainからResourceを引っ張ってくる
-	Microsoft::WRL::ComPtr<ID3D12Resource>swapChainResource[2] = { nullptr };
-
 #pragma endregion
 
 #pragma region 各種デスクリプタヒープの生成
@@ -136,7 +132,8 @@ private:
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle;
-
+	//SwapchainからResourceを引っ張ってくる
+	Microsoft::WRL::ComPtr<ID3D12Resource>swapChainResource[2];;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>rtvDescriptorHeap;
 
 #pragma endregion
