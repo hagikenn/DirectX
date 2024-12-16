@@ -145,7 +145,7 @@ private:
 
 #pragma region 深度ステンシルビューの初期化
 
-	Microsoft::WRL::ComPtr<ID3D12Resource>depthStencilResource;
+	Microsoft::WRL::ComPtr<ID3D12Resource>depthStencilResource=nullptr;
 #pragma endregion
 
 #pragma region フェンスの初期化
