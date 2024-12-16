@@ -164,7 +164,12 @@ private:
 	IDxcIncludeHandler* includeHandler;
 #pragma endregion
 
-	
+	//ビューポート矩形
+	D3D12_VIEWPORT viewport;
+
+	//シザリング矩形
+	D3D12_RECT scissorRect{};
+
 
 };
 

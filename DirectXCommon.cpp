@@ -409,6 +409,13 @@ void DirectXCommon::FenceInitialize()
 //ビューポート矩形の初期化
 void DirectXCommon::ViewPortRectangle()
 {
+	viewport.Width = WinApp::kClientWidth;
+	viewport.Height = WinApp::kClientHeight;
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+
 }
 
 //シザリング矩形の初期化
