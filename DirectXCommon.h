@@ -130,7 +130,6 @@ private:
 	uint32_t descriptorSizeRTV;
 	uint32_t descriptorSizeDSV;
 	Microsoft::WRL::ComPtr<ID3D12Resource>textureResource2;
-	Microsoft::WRL::ComPtr<ID3D12Resource>depthStencilResource2;
 #pragma endregion
 
 #pragma region レンダーターゲットビューの初期化
@@ -145,7 +144,7 @@ private:
 
 #pragma region 深度ステンシルビューの初期化
 
-	Microsoft::WRL::ComPtr<ID3D12Resource>depthStencilResource=nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource>depthStencilResource;
 #pragma endregion
 
 #pragma region フェンスの初期化

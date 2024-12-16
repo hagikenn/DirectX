@@ -373,7 +373,9 @@ void DirectXCommon::RTVInitialize()
 //深度ステンシルビューの初期化
 void DirectXCommon::DSVInitialize()
 {
-	//depthStencilResource = CreateDepthStencilTextureResource(device.Get(), WinApp::kClientWidth, WinApp::kClientHeight);
+	
+	depthStencilResource = CreateDepthStencilTextureResource(device.Get(), WinApp::kClientWidth, WinApp::kClientHeight);
+
 
 	////DSVようのヒープでディスクリプタの数1、shader内で触らないのでfalse
 	//dsvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
