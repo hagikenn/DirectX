@@ -326,46 +326,20 @@ void DirectXCommon::DepthBuffer()
 //各種デスクリプタヒープの生成
 void DirectXCommon::DescriptorHeap()
 {
-#pragma region ディスクリプターヒープの生成
-
-	rtvDescriptorHeap = CreateDescriptorHeap( D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
-	srvDescriptorHeap = CreateDescriptorHeap( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
-	dsvDescriptorHeap2 = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
-
-
-#pragma endregion
 
 	descriptorSizeSRV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	descriptorSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
-	////textureを読んで転送
-	//DirectX::ScratchImage mipImages2 = LoadTexture("resource/monsterBall.png");
-	//const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
-	//Microsoft::WRL::ComPtr<ID3D12Resource>textureResource2 = CrateTextureResource(device.Get(), metadata2);
-	//UploadTextureData(textureResource2.Get(), mipImages2);
+#pragma region ディスクリプターヒープの生成
 
-	//depthStencilResource2 = CreateDepthStencilTextureResource(device.Get(), WinApp::kClientWidth, WinApp::kClientHeight);
+	rtvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
+	srvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+	dsvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 
 
-	//
-
-	////metadataを基にSRVの設定
-	//D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc2{};
-	//srvDesc2.Format = metadata2.format;
-	//srvDesc2.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	//srvDesc2.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	//srvDesc2.Texture2D.MipLevels = UINT(metadata2.mipLevels);
-
-	////SRVを作成するDescriptorHeap場所決め
-	//D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2 = GetCPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSizeSRV, 2);
-	//D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2 = GetGPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSizeSRV, 2);
-	//////先頭ImGui
-	////textureSrvHandleCPU2.ptr += descriptorSizeSRV;
-	////textureSrvHandleGPU2.ptr += descriptorSizeSRV;
-	////SRVの生成
-	//device->CreateShaderResourceView(textureResource2.Get(), &srvDesc2, textureSrvHandleCPU2);
-
+#pragma endregion
+	
 }
 
 //レンダーターゲットビューの初期化
