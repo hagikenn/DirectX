@@ -156,9 +156,6 @@ void DirectXCommon::CreateDevice()
 
 #pragma region アダプタの作成
 
-	//使用するアダプタ用の変数。最初にnullptrを入れておく
-	Microsoft::WRL::ComPtr<IDXGIAdapter4>useAdapter = nullptr;
-	//IDXGIAdapter4* useAdapter = nullptr;
 	//良い順にアダプタを読む
 	for (UINT i = 0; dxgiFactory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&useAdapter)) != DXGI_ERROR_NOT_FOUND; i++) {
 		//アダプターの情報を取得する
@@ -181,8 +178,6 @@ void DirectXCommon::CreateDevice()
 
 
 #pragma region Deviceの生成
-	//ID3D12Device* device = nullptr;
-
 	D3D_FEATURE_LEVEL featureLevels[] = {
 		D3D_FEATURE_LEVEL_12_2,D3D_FEATURE_LEVEL_12_1,D3D_FEATURE_LEVEL_12_0
 	};
@@ -237,17 +232,6 @@ void DirectXCommon::CreateDevice()
 //コマンド関連の初期化
 void DirectXCommon::CommandInitialize()
 {
-#pragma region コマンドキュー
-	HRESULT hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
-	assert(SUCCEEDED(hr));
-
-	//ID3D12CommandQueue* commandQueue = nullptr;
-	D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
-	hr = device->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&commandQueue));
-	//生成できない場合
-	assert(SUCCEEDED(hr));
-
-#pragma endregion
 
 #pragma region コマンドアロケータ
 	//コマンドアロケータ生成
@@ -264,6 +248,18 @@ void DirectXCommon::CommandInitialize()
 	hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator.Get(), nullptr, IID_PPV_ARGS(&commandList));
 	//生成できない場合
 	assert(SUCCEEDED(hr));
+#pragma endregion
+
+#pragma region コマンドキュー
+	HRESULT hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
+	assert(SUCCEEDED(hr));
+
+	//ID3D12CommandQueue* commandQueue = nullptr;
+	D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
+	hr = device->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&commandQueue));
+	//生成できない場合
+	assert(SUCCEEDED(hr));
+
 #pragma endregion
 
 }

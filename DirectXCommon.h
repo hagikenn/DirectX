@@ -96,10 +96,15 @@ private:
 
 	//DirectX12デバイス
 	Microsoft::WRL::ComPtr<ID3D12Device>device = nullptr;
+	
+#pragma region デバイスの生成
+	//使用するアダプタ用の変数。最初にnullptrを入れておく
+	Microsoft::WRL::ComPtr<IDXGIAdapter4>useAdapter = nullptr;
+
 	//DXGIファクトリ
 	Microsoft::WRL::ComPtr<IDXGIFactory7>dxgiFactory;
 
-
+#pragma endregion
 
 #pragma region コマンドリスト
 	//コマンドリスト生成
