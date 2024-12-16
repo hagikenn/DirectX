@@ -414,6 +414,10 @@ void DirectXCommon::ViewPortRectangle()
 //シザリング矩形の初期化
 void DirectXCommon::ScissoringRectangle()
 {
+	scissorRect.left = 0;
+	scissorRect.right = WinApp::kClientWidth;
+	scissorRect.top = 0;
+	scissorRect.bottom = WinApp::kClientHeight;
 }
 
 //DXCコンパイラの生成
