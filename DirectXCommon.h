@@ -7,12 +7,24 @@
 #include<array>
 #include<dxcapi.h>
 #include"externals/DirectXTex/DirectXTex.h"
+#include <cassert>
+#include "Logger.h"
+#include <format>
+#include "StringUtility.h"
+#pragma comment(lib, "d3d12.lib")
+#pragma comment(lib, "dxgi.lib")
+#include "externals/imgui/imgui.h"
+#include "externals/imgui/imgui_impl_dx12.h"
+#include "externals/imgui/imgui_impl_win32.h"
 
 class DirectXCommon
 {
 public://メンバ関数
 	//初期化
 	void Initialize(WinApp* winApp);
+	
+	//getter
+	ID3D12Device* GetDevice()const { return device.Get(); }
 
 private:
 	//デバイスの生成
@@ -123,9 +135,8 @@ private:
 
 #pragma region レンダーターゲットビューの初期化
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
-
-
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle;
 #pragma endregion
 
 #pragma region 深度ステンシルビューの初期化
