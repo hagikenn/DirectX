@@ -184,7 +184,6 @@ private:
 
 #pragma region Fenceの値を更新
 
-	Microsoft::WRL::ComPtr<ID3D12Fence>fence = nullptr;
 	HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 
 #pragma endregion

@@ -571,11 +571,15 @@ void DirectXCommon::PostDraw()
 
 
 #pragma region Fenceの値を更新
+	
 	//初期化で0でFenceを作る
 	hr = device_->CreateFence(fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
 	assert(SUCCEEDED(hr));
 
 	assert(fenceEvent != nullptr);
+
+	//FENCEを更新する
+	fenceValue++;
 
 #pragma endregion
 
