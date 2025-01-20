@@ -1524,15 +1524,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// ++;
 
 
-		//if (fence->GetCompletedValue() < fenceValue) {
-
-		//	fence->SetEventOnCompletion(fenceValue, fenceEvent);
-
-		//	WaitForSingleObject(fenceEvent, INFINITE);
-
-		//}
-
-
 	}
 
 

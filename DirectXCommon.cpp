@@ -546,11 +546,22 @@ void DirectXCommon::PostDraw()
 
 	HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 	assert(fenceEvent != nullptr);
+
 #pragma endregion
 
 #pragma region コマンドキューにシグナルを送る
 	commandQueue->Signal(fence.Get(), fenceValue);
 #pragma endregion
+
+#pragma region コマンド完了待ち
+	if (fence->GetCompletedValue() < fenceValue) {
+
+		fence->SetEventOnCompletion(fenceValue, fenceEvent);
+
+		WaitForSingleObject(fenceEvent, INFINITE);
+	}
+#pragma endregion
+
 
 #pragma region コマンドアロケーターのリセット
 	hr = commandAllocator->Reset();
