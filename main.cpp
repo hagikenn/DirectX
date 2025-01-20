@@ -1314,22 +1314,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	
 
-
-
-	////初期化で0でFenceを作る
-	//Microsoft::WRL::ComPtr<ID3D12Fence>fence = nullptr;
-	////ID3D12Fence* fence = nullptr;
-	//uint64_t fenceValue = 0;
-	//hr = device->CreateFence(fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
-	//assert(SUCCEEDED(hr));
-
-	//HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-	//assert(fenceEvent != nullptr);
-
-
-
-
-
 	MSG msg{};
 	//ウィンドウの×ボタンが押されるまでループ
 	while (true) {
@@ -1455,6 +1439,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//ImGuiの内部コマンド
 		ImGui::Render();
 
+		//描画前処理
+		dxCommon->PreDraw();
 
 		////描画用のDescriptorHeap
 		//ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap.Get() };
@@ -1521,24 +1507,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//commandList->ResourceBarrier(1, &barrier);
 
 
-
+		z
 		////コマンドリストの内容を確定させる。全てのコマンドを積んでからclearする
 		//hr = commandList->Close();
 		//assert(SUCCEEDED(hr));
 
 
-		////GPUにコマンドリストの実行を行わせる
-		//ID3D12CommandList* commandLists[] = { commandList.Get() };
-		//commandQueue->ExecuteCommandLists(1, commandLists);
-		////GPUとOSに画面の交換を行うように通知する
-		//swapChain->Present(1, 0);
+		
 
 		////// 出力ウィンドウへの文字出力
 		////OutputDebugStringA("Hello DirectX!\n");
 		////FENCEを更新する
-		//fenceValue++;
+		//
+		// 
+		// 
+		// ++;
 
-		//commandQueue->Signal(fence.Get(), fenceValue);
 
 		//if (fence->GetCompletedValue() < fenceValue) {
 
@@ -1547,13 +1531,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//	WaitForSingleObject(fenceEvent, INFINITE);
 
 		//}
-
-
-		////次のフレームのコマンドリストを準備
-		//hr = commandAllocator->Reset();
-		//assert(SUCCEEDED(hr));
-		//hr = commandList->Reset(commandAllocator.Get(), nullptr);
-		//assert(SUCCEEDED(hr));
 
 
 	}

@@ -234,9 +234,7 @@ void DirectXCommon::CommandInitialize()
 {
 
 #pragma region コマンドアロケータ
-	//コマンドアロケータ生成
-	Microsoft::WRL::ComPtr<ID3D12CommandAllocator>commandAllocator = nullptr;
-	//ID3D12CommandAllocator* commandAllocator = nullptr;
+	
 	hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator));
 	//生成できない場合
 	assert(SUCCEEDED(hr));
@@ -461,11 +459,12 @@ void DirectXCommon::ImGuiInitialize()
 //描画前処理
 void DirectXCommon::PreDraw()
 {
-	//バックバッファの番号取得
+#pragma region バックバッファの番号取得
 	//これから書き込みバックバッファのインデックスを取得
 	UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+#pragma endregion
 
-	//リソースバリアで書き込み可能に変更
+#pragma region リソースバリアで書き込み可能に変更
 	//TransitionBarrierの設定
 	D3D12_RESOURCE_BARRIER barrier{};
 	//今回のバリアはTransition
@@ -480,24 +479,33 @@ void DirectXCommon::PreDraw()
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	//TransitionBarrierを張る
 	commandList->ResourceBarrier(1, &barrier);
+#pragma endregion
 
+#pragma region 描画先のRTVとDSVを指定する
 	// 描画先のRTVの設定をする
 	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, nullptr);
 	//DSV
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvHandle);
+#pragma endregion
 
-
+#pragma region 画面全体の色をクリア
 	//指定した色で画面をクリアする　
 	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
+#pragma endregion
+
+#pragma region 画面全体の深度をクリア
 	//コマンド蓄積
 	commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
+#pragma endregion
 
+#pragma region SRV用のデスクリプタヒープを指定する
 	//SRVを作成するDescriptorHeap場所決め
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2 = GetCPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSizeSRV, 2);
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2 = GetGPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSizeSRV, 2);
+#pragma endregion
 
-	//ビューポート
+#pragma region ビューポート領域の設定
 	D3D12_VIEWPORT viewport;
 	viewport.Width = WinApp::kClientWidth;
 	viewport.Height = WinApp::kClientHeight;
@@ -505,19 +513,57 @@ void DirectXCommon::PreDraw()
 	viewport.TopLeftY = 0;
 	viewport.MinDepth = 0.0f;
 	viewport.MaxDepth = 1.0f;
+#pragma endregion
 
-	//シザー矩形の設定
+#pragma region シザー矩形の設定
 	D3D12_RECT scissorRect{};
 	scissorRect.left = 0;
 	scissorRect.right = WinApp::kClientWidth;
 	scissorRect.top = 0;
 	scissorRect.bottom = WinApp::kClientHeight;
+#pragma endregion
 
 }
 
 //描画後処理
 void DirectXCommon::PostDraw()
 {
+#pragma region GPUコマンドの実行
+	//GPUにコマンドリストの実行を行わせる
+	ID3D12CommandList* commandLists[] = { commandList.Get() };
+	commandQueue->ExecuteCommandLists(1, commandLists);
+	//GPUとOSに画面の交換を行うように通知する
+	swapChain->Present(1, 0);
+#pragma endregion
+
+#pragma region Fenceの値を更新
+	//初期化で0でFenceを作る
+	Microsoft::WRL::ComPtr<ID3D12Fence>fence = nullptr;
+	//ID3D12Fence* fence = nullptr;
+	uint64_t fenceValue = 0;
+	hr = device->CreateFence(fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+	assert(SUCCEEDED(hr));
+
+	HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+	assert(fenceEvent != nullptr);
+#pragma endregion
+
+#pragma region コマンドキューにシグナルを送る
+	commandQueue->Signal(fence.Get(), fenceValue);
+#pragma endregion
+
+#pragma region コマンドアロケーターのリセット
+	hr = commandAllocator->Reset();
+	assert(SUCCEEDED(hr));
+#pragma endregion
+
+#pragma region コマンドリストのリセット
+	//次のフレームのコマンドリストを準備
+	hr = commandList->Reset(commandAllocator.Get(), nullptr);
+	assert(SUCCEEDED(hr));
+#pragma endregion
+
+
 }
 
 Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> DirectXCommon::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible)

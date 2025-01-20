@@ -26,6 +26,12 @@ public://メンバ関数
 	//getter
 	ID3D12Device* GetDevice()const { return device.Get(); }
 
+	//描画前処理
+	void PreDraw();
+
+	//描画後処理
+	void PostDraw();
+
 private:
 	//デバイスの生成
 	void CreateDevice();
@@ -56,11 +62,7 @@ private:
 		OutputDebugStringA(message.c_str());
 	}
 
-	//描画前処理
-	void PreDraw();
-
-	//描画後処理
-	void PostDraw();
+	
 
 	///<summary>
 	///デスクリプタヒープを生成する
@@ -92,8 +94,7 @@ private:
 
 
 private:
-	//コマンドキュー生成
-	Microsoft::WRL::ComPtr<ID3D12CommandQueue>commandQueue = nullptr;
+	
 
 	//WindowAPI
 	WinApp* winApp = nullptr;
@@ -112,10 +113,13 @@ private:
 
 #pragma endregion
 
-#pragma region コマンドリスト
+#pragma region コマンド関連の初期化
 	//コマンドリスト生成
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>commandList = nullptr;
-	
+	//コマンドキュー生成
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue>commandQueue = nullptr;
+	//コマンドアロケータ生成
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator>commandAllocator = nullptr;
 #pragma endregion
 
 #pragma region スワップチェーンの生成
