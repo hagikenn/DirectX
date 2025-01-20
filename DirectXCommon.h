@@ -24,7 +24,10 @@ public://メンバ関数
 	void Initialize(WinApp* winApp);
 	
 	//getter
-	ID3D12Device* GetDevice()const { return device.Get(); }
+	ID3D12Device* GetDevice()const { return device_.Get(); }
+
+	//
+	ID3D12GraphicsCommandList* GetCommandList()  const { return commandList_.Get(); }
 
 	//描画前処理
 	void PreDraw();
@@ -102,7 +105,7 @@ private:
 	
 
 	//DirectX12デバイス
-	Microsoft::WRL::ComPtr<ID3D12Device>device = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Device>device_ = nullptr;
 	
 #pragma region デバイスの生成
 	//使用するアダプタ用の変数。最初にnullptrを入れておく
@@ -115,7 +118,7 @@ private:
 
 #pragma region コマンド関連の初期化
 	//コマンドリスト生成
-	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>commandList = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>commandList_ = nullptr;
 	//コマンドキュー生成
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue>commandQueue = nullptr;
 	//コマンドアロケータ生成
@@ -172,6 +175,24 @@ private:
 	//デフォルトインクルードハンドラの生成
 	IDxcIncludeHandler* includeHandler;
 #pragma endregion
+
+#pragma region 描画前描画後処理
+	//TransitionBarrierの設定
+	D3D12_RESOURCE_BARRIER barrier{};
+#pragma endregion
+
+
+#pragma region Fenceの値を更新
+
+	Microsoft::WRL::ComPtr<ID3D12Fence>fence = nullptr;
+	HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+
+#pragma endregion
+
+
+	//フェンス値
+	UINT64 fenceValue = 0;
+
 
 	//ビューポート矩形
 	D3D12_VIEWPORT viewport;
