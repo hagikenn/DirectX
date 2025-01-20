@@ -25,8 +25,6 @@ public://メンバ関数
 	
 	//getter
 	ID3D12Device* GetDevice()const { return device_.Get(); }
-
-	//
 	ID3D12GraphicsCommandList* GetCommandList()  const { return commandList_.Get(); }
 
 	//描画前処理
@@ -34,6 +32,33 @@ public://メンバ関数
 
 	//描画後処理
 	void PostDraw();
+
+	//シェーダーのコンパイル
+	Microsoft::WRL::ComPtr<IDxcBlob>CompileShader(
+		const std::wstring& filePath, const wchar_t* profile);
+
+	/// <summary>
+	/// バッファリソースの生成
+	/// </summary>
+	Microsoft::WRL::ComPtr<ID3D12Resource>CreateBufferResource(size_t sizeInBytes);
+
+	/// <summary>
+	/// テクスチャリソースの生成
+	/// </summary>
+	Microsoft::WRL::ComPtr<ID3D12Resource>CreateTextureResource(
+		ID3D12Device* device, const DirectX::TexMetadata& metadata);
+
+	/// <summary>
+	/// テクスチャデータの転送
+	/// </summary>
+	void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages);
+
+	/// <summary>
+	/// テクスチャファイルの読み込み
+	/// </summary>
+	/// <param name="filePath">テクスチャファイルのパス</param>
+	/// <returns>画像イメージデータ</returns>
+	static DirectX::ScratchImage LoadTexture(const std::string& filePath);
 
 private:
 	//デバイスの生成
@@ -102,7 +127,6 @@ private:
 	//WindowAPI
 	WinApp* winApp = nullptr;
 
-	
 
 	//DirectX12デバイス
 	Microsoft::WRL::ComPtr<ID3D12Device>device_ = nullptr;
