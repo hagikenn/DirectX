@@ -56,6 +56,12 @@ private:
 		OutputDebugStringA(message.c_str());
 	}
 
+	//描画前処理
+	void PreDraw();
+
+	//描画後処理
+	void PostDraw();
+
 	///<summary>
 	///デスクリプタヒープを生成する
 	/// </summary>
