@@ -1699,36 +1699,35 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			
 
+
 			//球体
 			commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
 			commandList->SetGraphicsRootConstantBufferView(0, materialResourceSphere->GetGPUVirtualAddress()); //rootParameterの配列の0番目 [0]
 			commandList->SetGraphicsRootConstantBufferView(1, wvpResourceSphere->GetGPUVirtualAddress());
 
-			if (useMonsterBall == false) {
-				commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-			}
-			else {
-				commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU2);
-			}
+
+			commandList->SetGraphicsRootDescriptorTable(2, useMonsterBall?textureSrvHandleGPU:textureSrvHandleGPU2);
+
 			commandList->SetGraphicsRootConstantBufferView(3, directionalLightSphereResource->GetGPUVirtualAddress());
+			//cameraのCBufferの場所を設定
+			commandList->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
 			commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
 			commandList->DrawInstanced(SphereVertexNum, 1, 0, 0);
-
-
-
 
 
 			//UI
 			commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
 			commandList->IASetIndexBuffer(&indexBufferViewSprite);
 			commandList->SetGraphicsRootConstantBufferView(0, materialResourceSprite->GetGPUVirtualAddress()); //rootParameterの配列の0番目 [0]
-			commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());		
+			commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
 			commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-			//cameraのCBufferの場所を設定
-			commandList->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
 
 			//ドローコール
-			commandList->DrawIndexedInstanced(6, 1, 0, 0 ,0);
+			commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+
+
+			
 
 			//実際のcommandListのImGui描画コマンドを挟む
 			ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
