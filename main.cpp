@@ -1706,7 +1706,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			commandList->SetGraphicsRootConstantBufferView(1, wvpResourceSphere->GetGPUVirtualAddress());
 
 
-			commandList->SetGraphicsRootDescriptorTable(2, useMonsterBall?textureSrvHandleGPU:textureSrvHandleGPU2);
+			commandList->SetGraphicsRootDescriptorTable(2, useMonsterBall?textureSrvHandleGPU2:textureSrvHandleGPU);
 
 			commandList->SetGraphicsRootConstantBufferView(3, directionalLightSphereResource->GetGPUVirtualAddress());
 			//cameraのCBufferの場所を設定
