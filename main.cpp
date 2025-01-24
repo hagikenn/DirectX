@@ -569,6 +569,7 @@ struct Material {
 	int32_t enableLighting;
 	float padding[3];//枠確保用06-01 9
 	Matrix4x4 uvTransform;
+	float shininess;
 };
 
 struct TransformationMatrix {
@@ -581,6 +582,10 @@ struct DirectionalLight {
 	Vector4 color;
 	Vector3 direction;
 	float intensity;
+};
+
+struct CameraForGPU {
+	Vector3 worldPosition;
 };
 
 Vector3 Normalize(const Vector3& v) {
@@ -1242,7 +1247,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #pragma region PSO
 
 
-	//RootSignature
+	//RootSignature作成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags =
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
@@ -1258,29 +1263,28 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
-	//RootParameter作成__
-	D3D12_ROOT_PARAMETER rootParameters[4] = {};
+	//RootParameter作成
+	D3D12_ROOT_PARAMETER rootParameters[5] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[0].Descriptor.ShaderRegister = 0;//Object3d.PS.hlsl の b0
-
 	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
 	rootParameters[1].Descriptor.ShaderRegister = 0;//Object3d.VS.hlsl の b0
-
-	descriptionRootSignature.pParameters = rootParameters;
-	descriptionRootSignature.NumParameters = _countof(rootParameters);
-
-
-
 	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;
 	rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
-
 	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBV
 	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//plxelshader
-	rootParameters[3].Descriptor.ShaderRegister = 1;//レジスタ番号
+	rootParameters[3].Descriptor.ShaderRegister = 1;//レジスタ番号1
+	rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBV
+	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//plxelshader
+	rootParameters[4].Descriptor.ShaderRegister = 2;//レジスタ番号2
+
+	descriptionRootSignature.pParameters = rootParameters;
+	descriptionRootSignature.NumParameters = _countof(rootParameters);
+
 
 	//2でまとめる
 
@@ -1487,8 +1491,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//色の設定
 	materialDateSphere->color =  Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	materialDateSphere->enableLighting = true;
-	materialDateSphere->uvTransform = MakeIdentity4x4();
-
+	materialDateSphere->shininess = 70;
 
 
 	//球体マテリアルのライト用のリソース
@@ -1501,6 +1504,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	directionalLightSphereData->color = { 1.0f,1.0f,1.0f,1.0f };
 	directionalLightSphereData->direction = { 0.0f,-1.0f,0.0f };
 	directionalLightSphereData->intensity = 1.0f;
+
+	//カメラ用のリソースを作る
+	ID3D12Resource* cameraResource = CreateBufferResource(device, sizeof(CameraForGPU));
+	//マテリアルにデータを書き込む
+	CameraForGPU* cameraData = nullptr;
+	//書き込むためのアドレスを取得
+	cameraResource->Map(0, nullptr, reinterpret_cast<void**>(&cameraData));
+	cameraData->worldPosition = { 0.0f,0.0f,-10.5f };
 
 	//spriteのリソース
 	ID3D12Resource* materialResourceSprite = CreateBufferResource(device, sizeof(Material));
@@ -1710,13 +1721,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			//UI
 			commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
 			commandList->IASetIndexBuffer(&indexBufferViewSprite);
-
 			commandList->SetGraphicsRootConstantBufferView(0, materialResourceSprite->GetGPUVirtualAddress()); //rootParameterの配列の0番目 [0]
-		
 			commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());		
-
 			commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+			//cameraのCBufferの場所を設定
+			commandList->SetGraphicsRootConstantBufferView(4, cameraResource->GetGPUVirtualAddress());
 
+			//ドローコール
 			commandList->DrawIndexedInstanced(6, 1, 0, 0 ,0);
 
 			//実際のcommandListのImGui描画コマンドを挟む
@@ -1770,7 +1781,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 
-		
+	cameraResource->Release();
 	CloseHandle(fenceEvent);	
 	fence->Release();
 	rtvDescriptorHeap->Release();
