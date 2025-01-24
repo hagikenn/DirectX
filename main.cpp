@@ -5,35 +5,20 @@
 #include<d3d12.h>
 #include<dxgi1_6.h>
 #include<cassert>
-
 #include <dxgidebug.h>
-
 #include <dxcapi.h>
-
-
 #include "externals/DirectXTex/DirectXTex.h"
-
-
 #include"externals/imgui/imgui.h"
 #include"externals/imgui/imgui_impl_dx12.h"
 #include"externals/imgui/imgui_impl_win32.h"
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
 #define _USE_MATH_DEFINES
 #include <math.h>
-
-
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
-
 #pragma comment(lib,"dxguid.lib")
-
-
 #pragma comment(lib,"dxcompiler.lib")
 
-//std::string str0{ "STRING!!!" };
-//
-//std::string str1{ std::to_string(10) };
 
 std::wstring ConvertString(const std::string& str) {
 	if (str.empty()) {
@@ -1182,13 +1167,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//SRVの生成
 	device->CreateShaderResourceView(textureResource2, &srvDesc2, textureSrvHandleCPU2);
 
-
-
-
-
-
-
-
 	//textureを読んで転送
 	DirectX::ScratchImage mipImages = LoadTexture("resource/uvChecker.png");
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
@@ -1218,13 +1196,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//SRVを作成するDescriptorHeap場所決め
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 0);
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = GetGPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 0);
-	//D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	//D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+	
 	//先頭ImGui
 	textureSrvHandleCPU.ptr += descriptorSizeSRV;
 	textureSrvHandleGPU.ptr += descriptorSizeSRV;
-	//textureSrvHandleCPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	//textureSrvHandleGPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	
 	//SRVの生成
 	device->CreateShaderResourceView(textureResource, &srvDesc, textureSrvHandleCPU);
 
@@ -1412,61 +1388,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #pragma endregion
 
-
-	//ID3D12Resource* vertexResource = CreateBufferResource(device, sizeof(VertexData) * 6);
-
-
-	//D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
-
-	//vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-
-	//vertexBufferView.SizeInBytes = sizeof(VertexData) * 6;
-
-	//vertexBufferView.StrideInBytes = sizeof(VertexData);
-
-
-	//ID3D12Resource* wvpResource = CreateBufferResource(device, sizeof(Matrix4x4));
-
-	//Matrix4x4* wvpDate = nullptr;
-
-	//wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpDate));
-
-	//*wvpDate = MakeIdentity4x4();
-
-	//VertexData* vertexData = nullptr;
-
-	//vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	////leftTop
-	//vertexData[0].position = { -0.5f, -0.5f,0.0f,1.0f };
-	//vertexData[0].texcoord = { 0.0f,1.0f };
-
-	////Top
-	//vertexData[1].position = { 0.0f, 0.5f,0.0f,1.0f };
-	//vertexData[1].texcoord = { 0.5f,0.0f };
-
-	////rightBottom
-	//vertexData[2].position = { 0.5f, -0.5f,0.0f,1.0f };
-	//vertexData[2].texcoord = { 1.0f,1.0f };
-
-
-
-	////leftTop
-	//vertexData[3].position = { -0.5f, -0.5f,0.5f,1.0f };
-	//vertexData[3].texcoord = { 0.0f,1.0f };
-
-	////Top
-	//vertexData[4].position = { 0.0f, 0.0f,0.0f,1.0f };
-	//vertexData[4].texcoord = { 0.5f,0.0f };
-
-	////rightBottom
-	//vertexData[5].position = { 0.5f, -0.5f,-0.5f,1.0f };
-	//vertexData[5].texcoord = { 1.0f,1.0f };
-
-
-
-
-
-
 	uint32_t SphereVertexNum = 16 * 16 * 6;
 
 	//Sphere
@@ -1556,22 +1477,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	indexDataSprite[4] = 3;
 	indexDataSprite[5] = 2;
 
-
-
-
-	////三角用マテリアル
-	////マテリアル用のリソース
-	//ID3D12Resource* materialResource = CreateBufferResource(device, sizeof(Vector4));
-	////マテリアルにデータを書き込む
-	//Vector4* materialDate = nullptr;
-	////書き込むためのアドレス
-	//materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialDate));
-	////色の設定
-	//*materialDate = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-
-
-
-
 	//球体用マテリアル
 	//マテリアル用のリソース
 	ID3D12Resource* materialResourceSphere = CreateBufferResource(device, sizeof(Material));
@@ -1596,10 +1501,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	directionalLightSphereData->color = { 1.0f,1.0f,1.0f,1.0f };
 	directionalLightSphereData->direction = { 0.0f,-1.0f,0.0f };
 	directionalLightSphereData->intensity = 1.0f;
-
-
-
-
 
 	//spriteのリソース
 	ID3D12Resource* materialResourceSprite = CreateBufferResource(device, sizeof(Material));
@@ -1630,30 +1531,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	scissorRect.top = 0;
 	scissorRect.bottom = kClientHeight;
 
-				
-
 	Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
 	Transform cameraTransform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f}, {0.0f,0.0f,-10.5f} };
-
-	Transform transformSprite{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
-
-	Transform transformSphere{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
-
+	Transform transformSphere{ {1.0f,1.0f,1.0f},{0.0f,-1.5f,0.0f} ,{0.0f,0.0f,0.0f} };
 	Transform transformL{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
-
-
-	Transform uvTransformSprite{
-		{ 1.0f,1.0f,1.0f },
-		{ 0.0f,0.0f,0.0f },
-		{ 0.0f,0.0f,0.0f }
-	};
-
-
-	//float *inputMaterial[3] = { &materialDate->x,&materialDate->y,&materialDate->z };
-	//float* inputTransform[3] = { &transform.translate.x,&transform.translate.y,&transform.translate.z };
-	//float* inputRotate[3] = { &transform.rotate.x,&transform.rotate.y,&transform.rotate.z };
-	//float* inputScale[3] = { &transform.scale.x,&transform.scale.y,&transform.scale.z };
-
 
 	float* inputMaterialSphere[3] = { &materialDateSphere->color.x,&materialDateSphere->color.y,&materialDateSphere->color.z };
 	float* inputTransformSphere[3] = { &transformSphere.translate.x,&transformSphere.translate.y,&transformSphere.translate.z };
@@ -1707,21 +1588,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();
 
-			//transform.rotate.y += 0.03f;
-
 			Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 			Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 			Matrix4x4 viewMatrix = Inverse(cameraMatrix);
 			Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(1280.0f) / float(720.0f), 0.1f, 100.0f);
-			//Matrix4x4 projectionMatrix = MakeOrthographicMatrix((float)scissorRect.left, (float)scissorRect.top, (float)scissorRect.right, (float)scissorRect.bottom, 0.1f, 100.0f);
 			Matrix4x4 WorldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 
-			//三角
-			//*wvpDate = WorldViewProjectionMatrix;
-
-
+			
 			//球体
-
 			Matrix4x4 worldMatrixSphere = MakeAffineMatrix(transformSphere.scale, transformSphere.rotate, transformSphere.translate);
 			Matrix4x4 WorldViewProjectionMatrixSphere = Multiply(worldMatrixSphere, Multiply(viewMatrix, projectionMatrix));
 
@@ -1735,24 +1609,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			directionalLightSphereData->direction = Normalize(directionalLightSphereData->direction);
 
 		
-			Matrix4x4 worldMatrixSprite = MakeAffineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.translate);
-			//Matrix4x4 cameraMatrixSprite = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+			
 			Matrix4x4 viewMatrixSprite = MakeIdentity4x4();
-			//Matrix4x4 projectionMatrixSprite = MakePerspectiveFovMatrix(0.45f, float(1280.0f) / float(720.0f), 0.1f, 100.0f);
 			Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f, 0.0f, (float)kClientWidth, (float)kClientHeight, 0.0f, 100.0f);
-			Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
-
-			transformationMatrixDataSprite->WVP = worldViewProjectionMatrixSprite;
-
-
-			Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransformSprite.scale);
-			uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransformSprite.rotate.z));
-			uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.translate));
-			materialDateSprite->uvTransform = uvTransformMatrix;
-
-			//開発用UIの処理
-			ImGui::ShowDemoWindow();
-
+			
+			
 			//ここにテキストを入れられる
 			ImGui::Text("ImGuiText");
 
@@ -1765,36 +1626,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			ImGui::InputFloat3("RotateSphere", *inputRotateSphere);
 			ImGui::SliderFloat3("SliderRotateSphere", *inputRotateSphere, -10.0f, 10.0f);
-
-			ImGui::InputFloat3("ScaleSphere", *inputScaleSphere);
-
-			ImGui::InputFloat("SphereTexture", &textureChange);
-
 			ImGui::Checkbox("useMonsterBall", &useMonsterBall);
 
 
 			ImGui::Text("Ligth");
 			ImGui::InputFloat4("MaterialLigth", *inputMaterialLigth);
-			//ImGui::SliderFloat4("SliderMaterialLigth", *inputMaterialLigth, 0.0f, 1.0f);
-
 			ImGui::InputFloat3("VertexLigth", *inputDirectionLight);
 			ImGui::SliderFloat3("SliderVertexLigth", *inputDirectionLight, -1.0f, 1.0f);
 
-			ImGui::Text("Sprite");
-			ImGui::InputFloat("SpriteX", &transformSprite.translate.x);
-			ImGui::SliderFloat("SliderSpriteX", &transformSprite.translate.x, 0.0f, 1000.0f);
-
-			ImGui::InputFloat("SpriteY", &transformSprite.translate.y);
-			ImGui::SliderFloat("SliderSpriteY", &transformSprite.translate.y, 0.0f, 600.0f);
-
-			ImGui::InputFloat("SpriteZ", &transformSprite.translate.z);
-			ImGui::SliderFloat("SliderSpriteZ", &transformSprite.translate.z, 0.0f, 0.0f);
-
-
-			ImGui::DragFloat2("UVTranlate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
-			ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
-			ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);
-
+			
 
 
 			//ImGuiの内部コマンド
@@ -1847,14 +1687,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			commandList->SetPipelineState(graphicsPipelineState);
 			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			
-			//三角
-			//commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
-			//commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress()); //rootParameterの配列の0番目 [0]
-			//commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
-			//commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);	
-			//commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-			//commandList->DrawInstanced(6, 1, 0, 0);
-
 
 			//球体
 			commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);
@@ -1898,8 +1730,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			//TransitionBarrierを張る
 			commandList->ResourceBarrier(1, &barrier);
 
-
-
 			//コマンドリストの内容を確定させる。全てのコマンドを積んでからclearする
 			hr = commandList->Close();
 			assert(SUCCEEDED(hr));
@@ -1911,8 +1741,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			//GPUとOSに画面の交換を行うように通知する
 			swapChain->Present(1, 0);
 
-			//// 出力ウィンドウへの文字出力
-			//OutputDebugStringA("Hello DirectX!\n");
 			//FENCEを更新する
 			fenceValue++;
 
