@@ -1,16 +1,11 @@
 #include"Object3d.hlsli"
 
-
-//float4 main() : SV_TARGET
-//{
-//    return float4(1.0f, 1.0f, 1.0f, 1.0f);
-//}
-
 struct Material
 {
     float32_t4 color;
     int32_t enableLighting;
     float32_t4x4 uvTransform;
+    float32_t shininess;
 };
 
 struct DirectionalLight
@@ -20,14 +15,17 @@ struct DirectionalLight
     float intensity;
 };
 
-ConstantBuffer<Material> gMaterial : register(b0);
-ConstantBuffer<DirectionalLight> gDirectionalLight : register(b1);
+struct Camera
+{
+    float32_t3 worldPosition;
+};
+
 
 Texture2D<float32_t4> gTexture : register(t0);
-
 SamplerState gSampler : register(s0);
-
-
+ConstantBuffer<Material> gMaterial : register(b0);
+ConstantBuffer<DirectionalLight> gDirectionalLight : register(b1);
+ConstantBuffer<Camera> gCamera : register(b2);
 
 struct PixelShaderOutput
 {
@@ -43,9 +41,27 @@ PixelShaderOutput main(VertexShaderOutput input)
     
     if (gMaterial.enableLighting != 0)
     {
+        //カメラの位置から頂点を引く
+        float32_t3 toEye = normalize(gCamera.worldPosition - input.worldPosition);
+        float32_t3 reflectLight = reflect(gDirectionalLight.direction, normalize(input.normal));
+        float RdatE = dot(reflectLight, toEye);
+        float specularPow = pow(saturate(RdatE), gMaterial.shininess); //反射強度
+        
         float NdotL = dot(normalize(input.normal), -gDirectionalLight.direction);
         float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
-        output.color = gMaterial.color * textureColor * gDirectionalLight.color * cos * gDirectionalLight.intensity;
+        ////output.color = gMaterial.color * textureColor * gDirectionalLight.color * cos * gDirectionalLight.intensity;
+        
+        //拡散反射
+        float32_t3 diffuse =
+        gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
+        //鏡面反射
+        float32_t3 specular =
+        gDirectionalLight.color.rgb * gDirectionalLight.intensity * specularPow * float32_t3(1.0f, 1.0f, 1.0f);
+        //拡散反射+鏡面反射
+        output.color.rgb = diffuse + specular;
+        //アルファは今まで通り
+        output.color.a = gMaterial.color.a * textureColor.a;
+        
     }
     else
     {
