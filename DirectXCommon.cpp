@@ -9,6 +9,10 @@ using namespace Microsoft::WRL;
 
 void DirectXCommon::Initialize(WinApp* winApp)
 {
+	//FPS固定初期化
+	InitializeFixFPS();
+
+
 	//NULL検出
 	assert(winApp);
 
@@ -40,6 +44,7 @@ void DirectXCommon::Initialize(WinApp* winApp)
 	//ImGuiの初期化
 	ImGuiInitialize();
 
+	
 }
 
 DirectX::ScratchImage LoadTexture(const std::string& filePath) {
@@ -697,6 +702,8 @@ void DirectXCommon::PostDraw()
 	}
 #pragma endregion
 
+	//FPS固定更新
+	UpdateFixFPS();
 
 #pragma region コマンドアロケーターのリセット
 	hr = commandAllocator->Reset();
@@ -710,6 +717,8 @@ void DirectXCommon::PostDraw()
 	assert(SUCCEEDED(hr));
 #pragma endregion
 
+
+	
 
 }
 
@@ -752,6 +761,14 @@ D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetSRVCPUDescriptorHandle(uint32_t in
 D3D12_GPU_DESCRIPTOR_HANDLE DirectXCommon::GetSRVGPUDescriptorHandle(uint32_t index)
 {
 	return D3D12_GPU_DESCRIPTOR_HANDLE();
+}
+
+void DirectXCommon::InitializeFixFPS()
+{
+}
+
+void DirectXCommon::UpdateFixFPS()
+{
 }
 
 Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring& filePath, const wchar_t* profile)
