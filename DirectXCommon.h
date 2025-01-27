@@ -61,6 +61,26 @@ public://メンバ関数
 	/// <returns>画像イメージデータ</returns>
 	static DirectX::ScratchImage LoadTexture(const std::string& filePath);
 
+	///<summary>
+	///指定番号のCPUデスクリプタハンドルを取得する
+	/// </summary>
+	static D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap,
+		uint32_t descriptorSize, uint32_t index);
+
+	///<summary>
+	///指定番号のGPUデスクリプタハンドルを取得する
+	/// </summary>
+	static D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap,
+		uint32_t descriptorSize, uint32_t index);
+
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>rtvDescriptorHeap;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>srvDescriptorHeap;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>dsvDescriptorHeap;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>dsvDescriptorHeap2;
+	uint32_t descriptorSizeSRV;
+	uint32_t descriptorSizeRTV;
+	uint32_t descriptorSizeDSV;
+
 private:
 	//デバイスの生成
 	void CreateDevice();
@@ -98,18 +118,7 @@ private:
 	/// </summary>
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 
-	///<summary>
-	///指定番号のCPUデスクリプタハンドルを取得する
-	/// </summary>
-	static D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap,
-		uint32_t descriptorSize, uint32_t index);
-
-	///<summary>
-	///指定番号のGPUデスクリプタハンドルを取得する
-	/// </summary>
-	static D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& descriptorHeap,
-		uint32_t descriptorSize, uint32_t index);
-
+	
 	///<summary>
 	///SRVの指定番号のCPUデスクリプタハンドルを取得する
 	/// </summary>
@@ -120,6 +129,7 @@ private:
 	/// </summary>
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandle(uint32_t index);
 
+	
 
 
 private:
@@ -160,13 +170,7 @@ private:
 
 #pragma region 各種デスクリプタヒープの生成
 	
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>srvDescriptorHeap;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>dsvDescriptorHeap;
-
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>dsvDescriptorHeap2;
-	uint32_t descriptorSizeSRV;
-	uint32_t descriptorSizeRTV;
-	uint32_t descriptorSizeDSV;
+	
 	Microsoft::WRL::ComPtr<ID3D12Resource>textureResource2;
 #pragma endregion
 
@@ -176,7 +180,6 @@ private:
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle;
 	//SwapchainからResourceを引っ張ってくる
 	Microsoft::WRL::ComPtr<ID3D12Resource>swapChainResource[2]={ nullptr };
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>rtvDescriptorHeap;
 
 #pragma endregion
 
