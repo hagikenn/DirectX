@@ -596,34 +596,36 @@ void DirectXCommon::PreDraw()
 #pragma region 画面全体の深度をクリア
 	//コマンド蓄積
 	commandList_->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
+	commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
+	commandList_->RSSetViewports(1, &viewport);
+	commandList_->RSSetScissorRects(1, &scissorRect);
+
+
+
 #pragma endregion
 
 
 #pragma region SRV用のデスクリプタヒープを指定する
-	//SRVを作成するDescriptorHeap場所決め
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2 = GetCPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSizeSRV, 2);
-	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2 = GetGPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSizeSRV, 2);
+
+
+	ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap.Get() };
+	commandList_->SetDescriptorHeaps(1, descriptorHeaps);
+
 #pragma endregion
 
 
 #pragma region ビューポート領域の設定
-	D3D12_VIEWPORT viewport;
-	viewport.Width = WinApp::kClientWidth;
-	viewport.Height = WinApp::kClientHeight;
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
+	commandList_->RSSetViewports(1, &viewport);
 #pragma endregion
 
 
 #pragma region シザー矩形の設定
-	D3D12_RECT scissorRect{};
-	scissorRect.left = 0;
-	scissorRect.right = WinApp::kClientWidth;
-	scissorRect.top = 0;
-	scissorRect.bottom = WinApp::kClientHeight;
+	commandList_->RSSetScissorRects(1, &scissorRect);
 #pragma endregion
+
+	
+
 
 }
 

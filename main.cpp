@@ -1246,59 +1246,52 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//描画前処理
 		dxCommon->PreDraw();
 
-		////描画用のDescriptorHeap
-		//ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap.Get() };
-		//commandList->SetDescriptorHeaps(1, descriptorHeaps);
+
+		dxCommon->GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
+		dxCommon->GetCommandList()->SetPipelineState(graphicsPipelineState.Get());
+		dxCommon->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		//model
+		dxCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferViewModel);
+
+		dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResourceSphere->GetGPUVirtualAddress()); //rootParameterの配列の0番目 [0]
+
+		dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResourceSphere->GetGPUVirtualAddress());
 
 
-		//commandList->RSSetViewports(1, &viewport);
-		//commandList->RSSetScissorRects(1, &scissorRect);
+		if (textureChange == 0) {
+			dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+		}
+		else {
+			dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU2);
+		}
 
-		//dxCommon->GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
-		//dxCommon->GetCommandList()->SetPipelineState(graphicsPipelineState.Get());
-		//dxCommon->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		////model
-		//dxCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferViewModel);
-
-		//dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResourceSphere->GetGPUVirtualAddress()); //rootParameterの配列の0番目 [0]
-
-		//dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResourceSphere->GetGPUVirtualAddress());
+		dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightSphereResource->GetGPUVirtualAddress());
 
 
-		//if (textureChange == 0) {
-		//	dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-		//}
-		//else {
-		//	dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU2);
-		//}
-
-		//dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightSphereResource->GetGPUVirtualAddress());
-
-
-		//dxCommon->GetCommandList()->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-		//dxCommon->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+		dxCommon->GetCommandList()->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+		dxCommon->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
 
 
 
-		////UI
-		//dxCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
-		//dxCommon->GetCommandList()->IASetIndexBuffer(&indexBufferViewSprite);
+		//UI
+		dxCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+		dxCommon->GetCommandList()->IASetIndexBuffer(&indexBufferViewSprite);
 
-		//dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResourceSprite->GetGPUVirtualAddress()); //rootParameterの配列の0番目 [0]
+		dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResourceSprite->GetGPUVirtualAddress()); //rootParameterの配列の0番目 [0]
 
-		//dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
+		dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
 
-		//dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+		dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
 
-		//dxCommon->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		dxCommon->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
-		////実際のcommandListのImGui描画コマンドを挟む
-		//ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
+		//実際のcommandListのImGui描画コマンドを挟む
+		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dxCommon->GetCommandList());
 
 
-		////// 出力ウィンドウへの文字出力
-		////OutputDebugStringA("Hello DirectX!\n");
+		//// 出力ウィンドウへの文字出力
+		//OutputDebugStringA("Hello DirectX!\n");
 		
 
 		//描画後処理

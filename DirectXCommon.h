@@ -26,6 +26,7 @@ public://メンバ関数
 	//getter
 	ID3D12Device* GetDevice()const { return device_.Get(); }
 	ID3D12GraphicsCommandList* GetCommandList()  const { return commandList_.Get(); }
+	ID3D12DescriptorHeap* GetSrvDescriptorHeap()const { return srvDescriptorHeap.Get(); }
 
 	//描画前処理
 	void PreDraw();
