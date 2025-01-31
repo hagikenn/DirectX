@@ -16,6 +16,7 @@
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
+#include<chrono>
 
 class DirectXCommon
 {
@@ -80,6 +81,9 @@ public://メンバ関数
 	uint32_t descriptorSizeSRV;
 	uint32_t descriptorSizeRTV;
 	uint32_t descriptorSizeDSV;
+
+	//記録時間(FPS固定用)
+	std::chrono::steady_clock::time_point reference_;
 
 private:
 	//デバイスの生成
