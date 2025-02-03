@@ -86,6 +86,15 @@ public://メンバ関数
 	//記録時間(FPS固定用)
 	std::chrono::steady_clock::time_point reference_;
 
+	void Finalize();
+
+#pragma region Fenceの値を更新
+
+	HANDLE fenceEvent;
+
+#pragma endregion
+
+
 private:
 	//デバイスの生成
 	void CreateDevice();
@@ -205,11 +214,12 @@ private:
 	HRESULT hr;
 
 	//DXCユーティリティの生成
-	IDxcUtils* dxcUtils;
+	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils;
 	//DXCコンパイラの生成
-	IDxcCompiler3* dxcCompiler;
+	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler;
 	//デフォルトインクルードハンドラの生成
-	IDxcIncludeHandler* includeHandler;
+	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler;
+
 #pragma endregion
 
 #pragma region 描画前描画後処理
@@ -218,11 +228,6 @@ private:
 #pragma endregion
 
 
-#pragma region Fenceの値を更新
-
-	HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-
-#pragma endregion
 
 
 	//フェンス値

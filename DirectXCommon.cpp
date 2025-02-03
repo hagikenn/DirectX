@@ -247,6 +247,11 @@ DirectX::ScratchImage DirectXCommon::LoadTexture(const std::string& filePath)
 	return mipImages;
 }
 
+void DirectXCommon::Finalize()
+{
+	CloseHandle(fenceEvent);
+}
+
 //デバイスの生成
 void DirectXCommon::CreateDevice()
 {
@@ -498,7 +503,7 @@ void DirectXCommon::FenceInitialize()
 	HRESULT hr = device_->CreateFence(fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
 	assert(SUCCEEDED(hr));
 
-	HANDLE fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+	fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 	assert(fenceEvent != nullptr);
 }
 
@@ -828,7 +833,7 @@ Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring
 		&shaderSourceBuffer,
 		arguments,
 		_countof(arguments),
-		includeHandler,
+		includeHandler.Get(),
 		IID_PPV_ARGS(&shaderResult));
 
 	assert(SUCCEEDED(hr));

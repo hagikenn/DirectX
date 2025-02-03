@@ -1348,7 +1348,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ImGui::DestroyContext();
 
 
-	//CloseHandle(fenceEvent);
+	
 
 #ifdef _DEBUG
 	//debugController->Release();
