@@ -49,7 +49,7 @@ public://メンバ関数
 	/// テクスチャリソースの生成
 	/// </summary>
 	Microsoft::WRL::ComPtr<ID3D12Resource>CreateTextureResource(
-		ID3D12Device* device, const DirectX::TexMetadata& metadata);
+	 const DirectX::TexMetadata& metadata);
 
 	/// <summary>
 	/// テクスチャデータの転送
@@ -156,8 +156,7 @@ private:
 	WinApp* winApp = nullptr;
 
 
-	//DirectX12デバイス
-	Microsoft::WRL::ComPtr<ID3D12Device>device_ = nullptr;
+
 	
 #pragma region デバイスの生成
 	//使用するアダプタ用の変数。最初にnullptrを入れておく
@@ -239,6 +238,9 @@ private:
 
 	//シザリング矩形
 	D3D12_RECT scissorRect{};
+
+	//DirectX12デバイス
+	Microsoft::WRL::ComPtr<ID3D12Device>device_ = nullptr;
 
 
 };

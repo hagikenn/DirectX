@@ -63,7 +63,7 @@ DirectX::ScratchImage LoadTexture(const std::string& filePath) {
 	return mipImages;
 }
 
-ID3D12Resource* CrateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata) {
+Microsoft::WRL::ComPtr<ID3D12Resource> CrateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata) {
 
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Width = UINT(metadata.width);//幅
@@ -84,7 +84,7 @@ ID3D12Resource* CrateTextureResource(ID3D12Device* device, const DirectX::TexMet
 
 
 	//Resouceの生成
-	ID3D12Resource* resource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
 	HRESULT hr = device->CreateCommittedResource(
 		&heapProperties,
 		D3D12_HEAP_FLAG_NONE,
@@ -94,6 +94,7 @@ ID3D12Resource* CrateTextureResource(ID3D12Device* device, const DirectX::TexMet
 		IID_PPV_ARGS(&resource)
 	);
 
+	
 
 	assert(SUCCEEDED(hr));
 	return resource;
@@ -117,7 +118,7 @@ void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mip
 	}
 }
 
-ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height) {
+Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height) {
 
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Width = width;
@@ -139,7 +140,7 @@ ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t 
 	depthClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
 	// resourceの生成
-	ID3D12Resource* resource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
 	HRESULT hr = device->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &depthClearValue, IID_PPV_ARGS(&resource));
 	assert(SUCCEEDED(hr));
 	return resource;
@@ -172,14 +173,14 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateBufferResource(size_
 
 
 		//実際に頂点リソースを作る
-		ID3D12Resource* vertexResource = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = nullptr;
 		HRESULT hr = device_->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &vertexResourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&vertexResource));
 		assert(SUCCEEDED(hr));
 
 		return vertexResource;
 }
 
-Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata)
+Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateTextureResource(const DirectX::TexMetadata& metadata)
 {
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Width = UINT(metadata.width);//幅
@@ -199,8 +200,8 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateTextureResource(ID3D
 
 
 	//Resouceの生成
-	ID3D12Resource* resource = nullptr;
-	HRESULT hr = device->CreateCommittedResource(
+	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
+	HRESULT hr = device_->CreateCommittedResource(
 		&heapProperties,
 		D3D12_HEAP_FLAG_NONE,
 		&resourceDesc,
@@ -304,7 +305,7 @@ void DirectXCommon::CreateDevice()
 #pragma endregion
 
 #ifdef _DEBUG
-	ID3D12InfoQueue* infoQueue = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue = nullptr;
 	if (SUCCEEDED(device_->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
 		//やばいエラー時に止まる
 		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
@@ -327,10 +328,9 @@ void DirectXCommon::CreateDevice()
 		infoQueue->PushStorageFilter(&filter);
 
 
-		//解放
-		infoQueue->Release();
+		////解放
+		//infoQueue->Release();
 	}
-
 
 #endif
 
@@ -339,6 +339,7 @@ void DirectXCommon::CreateDevice()
 //コマンド関連の初期化
 void DirectXCommon::CommandInitialize()
 {
+
 
 #pragma region コマンドアロケータ
 	
@@ -417,7 +418,7 @@ void DirectXCommon::DepthBuffer()
 
 
 	//resourceの生成
-	ID3D12Resource* resource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
 	HRESULT hr = device_->CreateCommittedResource(
 		&heapProperties,
 		D3D12_HEAP_FLAG_NONE,
@@ -619,8 +620,8 @@ void DirectXCommon::PreDraw()
 #pragma region SRV用のデスクリプタヒープを指定する
 
 
-	ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap.Get() };
-	commandList_->SetDescriptorHeaps(1, descriptorHeaps);
+	Microsoft::WRL::ComPtr <ID3D12DescriptorHeap> descriptorHeaps[] = { srvDescriptorHeap.Get() };
+	commandList_->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
 
 #pragma endregion
 
@@ -730,7 +731,7 @@ void DirectXCommon::PostDraw()
 Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> DirectXCommon::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible)
 {
 	//ディスクリプターヒープの生成
-	ID3D12DescriptorHeap* descriptorHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap = nullptr;
 	D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc{};
 	descriptorHeapDesc.Type = heapType;
 	descriptorHeapDesc.NumDescriptors = numDescriptors;

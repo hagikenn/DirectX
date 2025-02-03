@@ -23,6 +23,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 #include "Logger.h"
 #include <format>
 #include "StringUtility.h"
+#include "D3DResourceLeakChecker.h"
 
 struct Vector2 {
 	float x;
@@ -745,6 +746,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg,
 //Windowsアプリのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
+	D3DResourceLeakChecker leackChecker;
+
 	//ポインタ
 	DirectXCommon* dxCommon = nullptr;
 	WinApp* winApp = nullptr;
@@ -772,19 +775,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	dxCommon->Initialize(winApp);
 
 
-	struct D3DResourceLeakChecker {
-		~D3DResourceLeakChecker() {
-
-			//リソースリークチェック
-			Microsoft::WRL::ComPtr<IDXGIDebug1> debug;
-			if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
-				debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
-				debug->ReportLiveObjects(DXGI_DEBUG_APP, DXGI_DEBUG_RLO_ALL);
-				debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
-				//debug->Release();
-			}
-		}
-	};
+	
 
 #pragma region Deviceの生成
 
@@ -1125,13 +1116,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//textureを読んで転送
 	DirectX::ScratchImage mipImages = dxCommon->LoadTexture("resource/uvChecker.png");
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	Microsoft::WRL::ComPtr<ID3D12Resource>textureResource = dxCommon->CreateTextureResource(dxCommon->GetDevice(), metadata);
+	Microsoft::WRL::ComPtr<ID3D12Resource>textureResource = dxCommon->CreateTextureResource( metadata);
 	dxCommon->UploadTextureData(textureResource.Get(), mipImages);
 
 	//textureを読んで転送
 	DirectX::ScratchImage mipImages2 = dxCommon->LoadTexture("resource/monsterBall.png");
 	const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
-	Microsoft::WRL::ComPtr<ID3D12Resource>textureResource2 = dxCommon->CreateTextureResource(dxCommon->GetDevice(), metadata2);
+	Microsoft::WRL::ComPtr<ID3D12Resource>textureResource2 = dxCommon->CreateTextureResource( metadata2);
 	dxCommon->UploadTextureData(textureResource2.Get(), mipImages2);
 
 
@@ -1341,7 +1332,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	}
 
-
+	//入力解放
+	delete input;
 
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
@@ -1357,8 +1349,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	/*mipImages.Release();
 	mipImages2.Release();
 	*/
-	//入力解放
-	delete input;
+	dxCommon->Finalize();
+
+	//DirectX解放
+	delete dxCommon;
 
 	//WindowsAPIの終了処理
 	winApp->Finalize();
@@ -1366,8 +1360,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	delete winApp;
 	winApp = nullptr;
 
-	//DirectX解放
-	delete dxCommon;
+
+	
 
 	return 0;
 }
