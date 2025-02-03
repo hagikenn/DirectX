@@ -788,10 +788,11 @@ void DirectXCommon::UpdateFixFPS()
 		//1/60秒経過するまで微小なスリープを繰り返す
 		while (std::chrono::steady_clock::now() - reference_ < kMinTime) {
 			//1マイクロ秒スリープ
-			std::this_thread::
+			std::this_thread::sleep_for(std::chrono::microseconds(1));
 		}
 	}
-
+	//現在の時間を記録する
+	reference_ = std::chrono::steady_clock::now();
 
 }
 
