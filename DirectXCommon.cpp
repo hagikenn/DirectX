@@ -251,6 +251,11 @@ DirectX::ScratchImage DirectXCommon::LoadTexture(const std::string& filePath)
 void DirectXCommon::Finalize()
 {
 	CloseHandle(fenceEvent);
+
+	ImGui_ImplDX12_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
+
 }
 
 //デバイスの生成
