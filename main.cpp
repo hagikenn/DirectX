@@ -722,6 +722,16 @@ ModelData LoadObjFile(const std::string& directoryPath, const std::string& filen
 	return modelData;
 }
 
+Transform transformSphere{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
+
+//コールバック関数のプロトタイプ宣言
+typedef void (*Callback)();
+
+//判定を行うコールバック関数
+void judge_result() {
+	transformSphere.rotate.y += 0.5f;
+}
+
 //ウィンドウプロシージャ
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg,
 
@@ -1089,7 +1099,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Transform transformSprite{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
 
-	Transform transformSphere{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
+	
 
 	Transform transformL{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f} ,{0.0f,0.0f,0.0f} };
 
@@ -1190,8 +1200,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 
 		if (input->TriggerKey(DIK_SPACE)) {
-			TriggerCheck *= -1.0f;
-			transformSprite.translate.x += TriggerCheck;
+			/*TriggerCheck *= -1.0f;
+			transformSprite.translate.x += TriggerCheck;*/
+
+			Callback callback = judge_result;
+			callback();
 		}
 
 		//transform.rotate.y += 0.03f;
