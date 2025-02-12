@@ -1200,9 +1200,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 
 		if (input->TriggerKey(DIK_SPACE)) {
-			/*TriggerCheck *= -1.0f;
-			transformSprite.translate.x += TriggerCheck;*/
-
 			Callback callback = judge_result;
 			callback();
 		}
